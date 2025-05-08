@@ -18,6 +18,12 @@ export const adminLogin = async (req, res) => {
             return res.status(401).json({ message: 'Unauthorized: Not a superadmin' });
         }
 
+        const hardCodedPassword = "superadmin@123";
+
+        if (password !== hardCodedPassword) {
+            return res.status(401).json({ message: 'Invalid password' });
+        }
+
         const token = jwt.sign({ id: role._id, role: role.role }, JWT_SECRET, { expiresIn: "1d" });
 
         res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'strict' });
