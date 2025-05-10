@@ -1,6 +1,5 @@
 import Role from "../Model/Role.js";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
 
 const JWT_SECRET = "apple";
 
@@ -28,10 +27,18 @@ export const adminLogin = async (req, res) => {
 
         res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'strict' });
 
-        res.json({ message: `Login successful for ${role.role}`, id: role._id, token, role: role.role });
+        res.status(200).json({ message: `Login successful for ${role.role}`, id: role._id, token, role: role.role });
 
     } catch (error) {
         res.status(500).json({ message: error.message || "Something went wrong" });
     }
 };
 
+export const adminLogout = async (req, res) => {
+    try {
+        res.clearCookie('token');
+        res.status(200).json({ message: 'Super Admin Logged Out Successfully' });
+    } catch (error) {
+        res.status(500).json({ message: error.message || 'Logout Failed' });
+    }
+};

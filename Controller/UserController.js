@@ -21,44 +21,18 @@ export const userLogin = async (req, res) => {
     }
 
     if (user.mfaEnabled) {
-      return res.status(206).json({
-        message: 'MFA required',
-        userId: user._id
-      });
-    }
-/*
-    if (user.mfaEnabled) {
-      if (!user.mfaSecret) {
-        // MFA enabled but setup not complete
-        return res.status(206).json({
-          message: 'MFA setup required',
-          userId: user._id,
-          mfaSetupRequired: true
-        });
-      } else {
-        // MFA enabled and setup completed - require OTP
-        return res.status(206).json({
-          message: 'MFA verification required',
-          userId: user._id,
-          mfaSetupRequired: false
-        });
-      }
+      return res.status(206).json({ message: 'MFA required', userId: user._id });
     }  
-*/  
 
-    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET);
+    const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: '1d' });
     
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "None",
-    });
+    res.cookie('token', token, { httpOnly: true, secure: true, sameSite: "strict" });
 
-    res.status(200).json({ message: 'User logged in successfully', token, userId: user._id });
+    res.status(200).json({ message: `Login successful for ${user.role}`, id: user._id, token, role: user.role });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-}
+};
 
 export const verifyMfaToken = async (req, res) => {
   try {

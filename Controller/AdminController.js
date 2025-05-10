@@ -27,13 +27,10 @@ export const adminLogin = async (req, res) => {
 
         const token = jwt.sign({ id: admin._id, role: admin.role }, JWT_SECRET, { expiresIn: '1d' });
 
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'None',
-        });
+        res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'strict' });
 
-        res.status(200).json({ message: 'Admin logged in successfully', token, adminId: admin._id });
+        res.status(200).json({ message: `Login successful for ${admin.role}`, id: admin._id, token, role: admin.role });
+
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

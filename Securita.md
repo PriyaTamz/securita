@@ -13,7 +13,6 @@
 {
     "username": "superadmin",
     "password": "superadmin",
-    "role": "superadmin"
 }
 ```
 
@@ -82,20 +81,26 @@
 
 ### 4. Superadmin Get Organization By ID
 
-**Endpoint:** GET `/api/user/get/organization/68146decea661f7de5eb87a0`
+**Endpoint:** GET `/api/user/get/organization/681c85fa32378bb216a125c3`
 
 **Response**
 ```json
 {
     "orgs": {
-        "_id": "68146decea661f7de5eb87a0",
+        "_id": "681c85fa32378bb216a125c3",
         "organization": "UPS",
         "createdBy": "680dfc807b767d30080caf05",
-        "createdAt": "2025-05-02T07:02:04.851Z",
-        "updatedAt": "2025-05-02T07:02:04.852Z",
+        "createdAt": "2025-05-08T10:22:50.756Z",
+        "updatedAt": "2025-05-08T10:22:50.756Z",
         "__v": 0
     },
-    "userCount": 2
+    "userCount": 2,
+    "admins": [
+        {
+            "_id": "681c863932378bb216a125ca",
+            "username": "Priya"
+        }
+    ]
 }
 ```
 
@@ -106,7 +111,7 @@
 **Request Body**
 ```json
 {
-    "organizationId": "68146decea661f7de5eb87a0", 
+    "organizationId": "681c85fa32378bb216a125c3", 
     "username": "Priya", 
     "password": "123456"
 }

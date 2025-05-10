@@ -7,10 +7,6 @@ import qrcode from "qrcode";
 
 export const createOrganization = async (req, res) => {
     try {
-        if (req.user.role !== 'superadmin') {
-            return res.status(403).json({ message: 'Only superadmin can create organization' });
-        }
-
         const { organization } = req.body;
 
         const existingOrg = await Organization.findOne({ organization });
@@ -33,7 +29,7 @@ export const createOrganization = async (req, res) => {
 
 export const getAllOrganization = async (req, res) => {
     try {
-        const orgs = await Organization.find().select( '-createdAt -updatedAt -__v' );
+        const orgs = await Organization.find().select('-createdAt -updatedAt -__v');
         res.status(200).json({ orgs });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -50,7 +46,9 @@ export const getOrganizationById = async (req, res) => {
         }
 
         const userCount = await User.countDocuments({ organization: id });
-        res.status(200).json({ orgs, userCount });
+        const admins = await Admin.find({ organization: id }).select('username');
+        
+        res.status(200).json({ orgs, userCount, admins });
 
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -78,7 +76,7 @@ export const createAdmin = async (req, res) => {
             username,
             password: hashedPassword,
             role: 'admin',
-            createdBy: req.user._id 
+            createdBy: req.user._id
         });
 
         await newAdmin.save();
@@ -193,10 +191,6 @@ export const activateUser = async (req, res) => {
     try {
         const { id } = req.params;
 
-        if (req.user.role !== 'superadmin') {
-            return res.status(403).json({ message: 'Access denied. Only superadmin can activate users.' });
-        }
-
         const user = await User.findById(id);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
@@ -215,10 +209,6 @@ export const enableMfaForUser = async (req, res) => {
     try {
         const { id } = req.params;
 
-        if (req.user.role !== 'superadmin') {
-            return res.status(403).json({ message: 'Access denied. Only superadmin can enable MFA.' });
-        }
-
         const user = await User.findById(id);
         if (!user) {
             return res.status(404).json({ message: 'User not found.' });
@@ -234,18 +224,13 @@ export const enableMfaForUser = async (req, res) => {
         user.mfaSecret = secret.base32;
         await user.save();
 
-        qrcode.toDataURL(secret.otpauth_url, (err, data_url) => {
+        /*qrcode.toDataURL(secret.otpauth_url, (err, data_url) => {
             if (err) {
                 console.error('Error generating QR code:', err);
                 return res.status(500).json({ message: 'Failed to generate QR code.' });
-            }
+            }*/
 
-            return res.status(200).json({
-                message: 'MFA enabled successfully.',
-                qrCodeImage: data_url,
-                secret: secret.base32
-            });
-        });
+        return res.status(200).json({ message: 'MFA enabled successfully.' });
 
     } catch (error) {
         console.error('Error enabling MFA:', error);
