@@ -15,7 +15,7 @@ const organizationSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     }
-})
+});
 
 const Organization = mongoose.model('Organization', organizationSchema, 'organization');
 export default Organization;

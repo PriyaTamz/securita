@@ -3,7 +3,6 @@ import Admin from '../Model/Admin.js';
 import Organization from '../Model/Organization.js';
 import bcrypt from 'bcryptjs';
 import speakeasy from 'speakeasy';
-import qrcode from "qrcode";
 
 export const createOrganization = async (req, res) => {
     try {
@@ -45,9 +44,9 @@ export const getOrganizationById = async (req, res) => {
             return res.status(404).json({ message: 'Organization not found' });
         }
 
-        const userCount = await User.countDocuments({ organization: id });
+        const userCount = await User.countDocuments({ organizations: id });
         const admins = await Admin.find({ organization: id }).select('username');
-        
+
         res.status(200).json({ orgs, userCount, admins });
 
     } catch (error) {
@@ -89,11 +88,15 @@ export const createAdmin = async (req, res) => {
 
 export const createUser = async (req, res) => {
     try {
-        const { organizationId, username, password, firstName, lastName, email, phone, timeZone, mfaEnabled } = req.body;
+        const { organizationIds, username, password, firstName, lastName, email, phone, timeZone, mfaEnabled } = req.body;
 
-        const org = await Organization.findById(organizationId);
-        if (!org) {
-            return res.status(400).json({ message: 'Invalid organization' });
+        if (!Array.isArray(organizationIds) || organizationIds.length === 0) {
+            return res.status(400).json({ message: 'organizationIds must be a non-empty array' });
+        }
+
+        const orgs = await Organization.find({ _id: { $in: organizationIds } });
+        if (orgs.length !== organizationIds.length) {
+            return res.status(400).json({ message: 'One or more organizations are invalid' });
         }
 
         const existingUser = await User.findOne({ username });
@@ -104,7 +107,7 @@ export const createUser = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const newUser = new User({
-            organization: organizationId,
+            organizations: organizationIds,
             username,
             password: hashedPassword,
             firstName,
@@ -113,20 +116,21 @@ export const createUser = async (req, res) => {
             phone,
             timeZone,
             mfaEnabled: mfaEnabled || false,
-            createdBy: req.user.id,
+            createdBy: req.user.id
         });
 
         await newUser.save();
         res.status(201).json({ message: 'User created successfully', user: newUser });
 
     } catch (error) {
+        console.error('createUser error:', error);
         res.status(400).json({ message: error.message });
     }
 };
 
 export const getAllUsers = async (req, res) => {
     try {
-        const users = await User.find().select('-password -mfaSecret').populate('organization');
+        const users = await User.find().select('-password -mfaSecret').populate('organizations');
         res.status(200).json({ users });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -137,7 +141,7 @@ export const getUserById = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const user = await User.findById(id).select('-password -mfaSecret').populate('organization');
+        const user = await User.findById(id).select('-password -mfaSecret').populate('organizations');
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
@@ -157,7 +161,7 @@ export const updateUser = async (req, res) => {
             id,
             { firstName, lastName, email, phone, timeZone, updatedAt: new Date() },
             { new: true }
-        ).select('-password -mfaSecret').populate('organization');
+        ).select('-password -mfaSecret').populate('organizations');
 
         if (!updateUser) {
             return res.status(404).json({ message: 'User not found' });
@@ -223,12 +227,6 @@ export const enableMfaForUser = async (req, res) => {
         user.mfaEnabled = true;
         user.mfaSecret = secret.base32;
         await user.save();
-
-        /*qrcode.toDataURL(secret.otpauth_url, (err, data_url) => {
-            if (err) {
-                console.error('Error generating QR code:', err);
-                return res.status(500).json({ message: 'Failed to generate QR code.' });
-            }*/
 
         return res.status(200).json({ message: 'MFA enabled successfully.' });
 

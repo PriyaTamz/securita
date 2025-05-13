@@ -3,8 +3,38 @@ import Group from '../Model/Group.js';
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import speakeasy from 'speakeasy';
+import qrcode from "qrcode";
 
 const JWT_SECRET = "apple";
+
+export const getUserMfaQrCode = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findById(userId);
+    if (!user || !user.mfaEnabled || !user.mfaSecret) {
+      return res.status(400).json({ message: 'MFA not setup for this user' });
+    }
+
+    const otpauth_url = speakeasy.otpauthURL({
+      secret: user.mfaSecret,
+      label: `Securita (${user.email})`,
+      encoding: 'base32'
+    });
+
+    qrcode.toDataURL(otpauth_url, (err, data_url) => {
+      if (err) {
+        return res.status(500).json({ message: 'Failed to generate QR code.' });
+      }
+
+      res.status(200).json({ qrCodeImage: data_url });
+    });
+
+  } catch (err) {
+    console.error('QR Code fetch error:', err.message);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
 
 export const userLogin = async (req, res) => {
   try {

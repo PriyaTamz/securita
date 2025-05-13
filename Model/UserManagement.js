@@ -5,18 +5,17 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
-    email: { type: String, required: true },
-    phone: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    phone: { type: String, required: true, unique: true },
     timeZone: { type: String },
     mfaSecret: { type: String, default: null},
     mfaEnabled: { type: Boolean, default: false },
     isLdapUser: { type: Boolean, default: false },
     isActive: { type: Boolean, default: true },
-    organization: {
+    organizations: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Organization',
-        required: true
-    },
+        ref: 'Organization'
+    }],
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Role',
