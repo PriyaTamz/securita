@@ -44,16 +44,20 @@ export const getOrganizationById = async (req, res) => {
             return res.status(404).json({ message: 'Organization not found' });
         }
 
-        const userCount = await User.countDocuments({ organizations: id });
-        const admins = await Admin.find({ organization: id }).select('username');
+        const users = await User.find({ organizations: id }).select('username');
 
-        res.status(200).json({ orgs, userCount, admins });
+        const userCount = users.length;
+
+        const admins = await User.find({ adminOrganizations: id }).select('username');
+
+        res.status(200).json({ orgs, userCount, users, admins });
 
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
+/*
 export const createAdmin = async (req, res) => {
     try {
         const { organizationId, username, password } = req.body;
@@ -83,6 +87,67 @@ export const createAdmin = async (req, res) => {
 
     } catch (error) {
         res.status(400).json({ message: error.message });
+    }
+};
+*/
+
+export const createAdmin = async (req, res) => {
+    try {
+        const { organizationId, userId } = req.body;
+
+        const org = await Organization.findById(organizationId);
+        if (!org) {
+            return res.status(400).json({ message: 'Invalid organization' });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(400).json({ message: 'User not found' });
+        }
+
+        if (user.adminOrganizations.includes(organizationId)) {
+            return res.status(400).json({ message: 'User is already an admin for this organization' });
+        }
+
+        user.adminOrganizations.push(organizationId);
+        await user.save();
+
+        res.status(200).json({ message: 'User assigned as admin successfully', user });
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+export const removeAdmin = async (req, res) => {
+    try {
+        const { organizationId, userId } = req.body;
+
+        const org = await Organization.findById(organizationId);
+        if (!org) {
+            return res.status(400).json({ message: 'Invalid organization' });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(400).json({ message: 'User not found' });
+        }
+
+        if (!user.adminOrganizations.includes(organizationId)) {
+            return res.status(400).json({ message: 'User is not an admin of this organization' });
+        }
+
+        user.adminOrganizations = user.adminOrganizations.filter(
+            (orgId) => orgId.toString() !== organizationId
+        );
+
+        await user.save();
+
+        res.status(200).json({ message: 'Admin rights removed successfully', user });
+
+    } catch (error) {
+        console.error('removeAdmin error:', error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 };
 

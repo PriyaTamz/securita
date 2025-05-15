@@ -1,5 +1,5 @@
 import express from 'express';
-import { createAdmin, createUser, getAllUsers, getUserById, updateUser, deleteUser, activateUser, enableMfaForUser, createOrganization, getAllOrganization, getOrganizationById } from '../Controller/UserManagementController.js';
+import { createAdmin, removeAdmin, createUser, getAllUsers, getUserById, updateUser, deleteUser, activateUser, enableMfaForUser, createOrganization, getAllOrganization, getOrganizationById } from '../Controller/UserManagementController.js';
 import { isAuthenticated, authorizeRoles } from '../middleware/auth.js';
 import { authorizeRole } from '../middleware/authorizeRole.js';
 
@@ -10,6 +10,7 @@ userManagementRouter.get('/organization', isAuthenticated, authorizeRoles(['supe
 userManagementRouter.get('/get/organization/:id', isAuthenticated, authorizeRoles(['superadmin']), getOrganizationById);
 
 userManagementRouter.post('/create/admin', isAuthenticated, authorizeRoles('superadmin'), createAdmin);
+userManagementRouter.post('/remove/admin', isAuthenticated, authorizeRoles('superadmin'), removeAdmin);
 
 userManagementRouter.post('/create', isAuthenticated, authorizeRoles(['superadmin', 'admin']), createUser);
 userManagementRouter.get('/get', isAuthenticated, authorizeRoles(['superadmin', 'admin']), getAllUsers);

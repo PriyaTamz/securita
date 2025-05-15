@@ -8,11 +8,15 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     phone: { type: String, required: true, unique: true },
     timeZone: { type: String },
-    mfaSecret: { type: String, default: null},
+    mfaSecret: { type: String, default: null },
     mfaEnabled: { type: Boolean, default: false },
     isLdapUser: { type: Boolean, default: false },
     isActive: { type: Boolean, default: true },
     organizations: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Organization'
+    }],
+    adminOrganizations: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Organization'
     }],

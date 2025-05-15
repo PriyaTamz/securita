@@ -111,25 +111,77 @@
 **Request Body**
 ```json
 {
-    "organizationId": "681c85fa32378bb216a125c3", 
-    "username": "Priya", 
-    "password": "123456"
+    "organizationId": "682438b250539b4bbf1389ad",
+    "userId": "68247ae806f9593cacf5701a"
 }
 ```
 
 **Response**
 ```json
 {
-    "message": "Admin created successfully",
-    "admin": {
-        "username": "Priya",
-        "password": "<hashed_password>",
-        "role": "admin",
-        "organization": "68146decea661f7de5eb87a0",
-        "_id": "681afc42ca5f923eb4424b8c",
-        "createdAt": "2025-05-07T06:22:58.858Z",
-        "updatedAt": "2025-05-07T06:22:58.858Z",
-        "__v": 0
+    "message": "User assigned as admin successfully",
+    "user": {
+        "_id": "6824397550539b4bbf1389b9",
+        "username": "Akash",
+        "password": "$2b$10$yBZUngSGFeTyah6FbsGAMuZbqGhYkmtIX.7NfB38kmSayYj3l64xa",
+        "firstName": "Akash",
+        "lastName": "Prakash",
+        "email": "aaaaakash@gmail.com",
+        "phone": "9640995669",
+        "mfaSecret": null,
+        "mfaEnabled": false,
+        "isLdapUser": false,
+        "isActive": true,
+        "organizations": [
+            "6824389450539b4bbf1389aa"
+        ],
+        "adminOrganizations": [
+            "682438b250539b4bbf1389ad"
+        ],
+        "createdBy": "680dfc807b767d30080caf05",
+        "createdAt": "2025-05-14T06:34:29.043Z",
+        "updatedAt": "2025-05-14T10:45:15.835Z",
+        "__v": 1
+    }
+}
+```
+
+### 6. Superadmin Remove Admin
+
+**Endpoint:** POST `/api/user/remove/admin`
+
+**Request Body**
+```json
+{
+    "organizationId": "682438b250539b4bbf1389ad",
+    "userId": "68247ae806f9593cacf5701a"
+}
+```
+
+**Response**
+```json
+{
+    "message": "Admin rights removed successfully",
+    "user": {
+        "_id": "6824397550539b4bbf1389b9",
+        "username": "Akash",
+        "password": "$2b$10$yBZUngSGFeTyah6FbsGAMuZbqGhYkmtIX.7NfB38kmSayYj3l64xa",
+        "firstName": "Akash",
+        "lastName": "Prakash",
+        "email": "aaaaakash@gmail.com",
+        "phone": "9640995669",
+        "mfaSecret": null,
+        "mfaEnabled": false,
+        "isLdapUser": false,
+        "isActive": true,
+        "organizations": [
+            "6824389450539b4bbf1389aa"
+        ],
+        "adminOrganizations": [],
+        "createdBy": "680dfc807b767d30080caf05",
+        "createdAt": "2025-05-14T06:34:29.043Z",
+        "updatedAt": "2025-05-14T10:45:15.835Z",
+        "__v": 2
     }
 }
 ```
