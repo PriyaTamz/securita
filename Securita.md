@@ -423,6 +423,109 @@
 }
 ```
 
+### 13. Superadmin Create Group for User 
+
+**Endpoint:** POST `/api/user/create/group`
+
+**Request Body**
+```json
+{
+  "name": "TestGroup",
+  "userIds": ["6824390a50539b4bbf1389b1", "6825df807b60e021a3c40de9"],
+  "organizationId": "6824389450539b4bbf1389aa"
+}
+```
+
+**Response**
+```json
+{
+    "message": "Group created successfully",
+    "group": {
+        "name": "TestGroup",
+        "users": [
+            "6824390a50539b4bbf1389b1",
+            "6825df807b60e021a3c40de9"
+        ],
+        "organization": "6824389450539b4bbf1389aa",
+        "_id": "682c130542a34943efc43060",
+        "createdAt": "2025-05-20T05:28:37.496Z",
+        "__v": 0
+    }
+}
+```
+
+### 14. superadmin Get All User Group
+
+**Endpoint:** GET `/api/user/group`
+
+**Response**
+```json
+{
+    "groups": [
+        {
+            "_id": "6826d8b89f3244b64b11318c",
+            "name": "BCP",
+            "users": [
+                "6824390a50539b4bbf1389b1",
+                "6824397550539b4bbf1389b9",
+                "68243a2250539b4bbf1389bd"
+            ],
+            "organization": "6824389450539b4bbf1389aa",
+            "createdAt": "2025-05-16T06:18:32.266Z",
+            "__v": 0
+        },
+        {
+            "_id": "6826dcf724537e960aeae0c8",
+            "name": "LinuxGroup",
+            "users": [
+                "6824390a50539b4bbf1389b1",
+                "68243a4b50539b4bbf1389c1",
+                "68243ad550539b4bbf1389c5",
+                "6825df807b60e021a3c40de9"
+            ],
+            "organization": "6824389450539b4bbf1389aa",
+            "createdAt": "2025-05-16T06:36:39.630Z",
+            "__v": 0
+        },
+        {
+            "_id": "6826ddae24537e960aeae0cf",
+            "name": "Server",
+            "users": [
+                "6824390a50539b4bbf1389b1",
+                "68243ad550539b4bbf1389c5",
+                "68243b1d50539b4bbf1389c9"
+            ],
+            "organization": "682438b250539b4bbf1389ad",
+            "createdAt": "2025-05-16T06:39:42.414Z",
+            "__v": 0
+        },
+        {
+            "_id": "6826ddfe24537e960aeae0d5",
+            "name": "DBServer",
+            "users": [
+                "6824390a50539b4bbf1389b1",
+                "68243b1d50539b4bbf1389c9",
+                "68243bad50539b4bbf1389cd"
+            ],
+            "organization": "682438b250539b4bbf1389ad",
+            "createdAt": "2025-05-16T06:41:02.540Z",
+            "__v": 0
+        },
+        {
+            "_id": "682c130542a34943efc43060",
+            "name": "TestGroup",
+            "users": [
+                "6824390a50539b4bbf1389b1",
+                "6825df807b60e021a3c40de9"
+            ],
+            "organization": "6824389450539b4bbf1389aa",
+            "createdAt": "2025-05-20T05:28:37.496Z",
+            "__v": 0
+        }
+    ]
+}
+```
+
 ## Organization Admin
 
 ### 13. Admin Login 

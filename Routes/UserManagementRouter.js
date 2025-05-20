@@ -1,5 +1,5 @@
 import express from 'express';
-import { createAdmin, removeAdmin, createUser, getAllUsers, getUserById, updateUser, deleteUser, activateUser, enableMfaForUser, createOrganization, getAllOrganization, getOrganizationById } from '../Controller/UserManagementController.js';
+import { getAdminsByOrganization, createGroup, getAllGroup, createAdmin, removeAdmin, createUser, getAllUsers, getUsersByOrganization, getUserById, updateUser, deleteUser, activateUser, enableMfaForUser, createOrganization, getAllOrganization, getOrganizationById } from '../Controller/UserManagementController.js';
 import { isAuthenticated, authorizeRoles } from '../middleware/auth.js';
 import { authorizeRole } from '../middleware/authorizeRole.js';
 
@@ -10,10 +10,12 @@ userManagementRouter.get('/organization', isAuthenticated, authorizeRoles(['supe
 userManagementRouter.get('/get/organization/:id', isAuthenticated, authorizeRoles(['superadmin']), getOrganizationById);
 
 userManagementRouter.post('/create/admin', isAuthenticated, authorizeRoles('superadmin'), createAdmin);
+userManagementRouter.get('/admins/by-organization/:organizationId', isAuthenticated, authorizeRoles('superadmin'), getAdminsByOrganization);
 userManagementRouter.post('/remove/admin', isAuthenticated, authorizeRoles('superadmin'), removeAdmin);
 
 userManagementRouter.post('/create', isAuthenticated, authorizeRoles(['superadmin', 'admin']), createUser);
 userManagementRouter.get('/get', isAuthenticated, authorizeRoles(['superadmin', 'admin']), getAllUsers);
+userManagementRouter.get('/by-organization/:organizationId', isAuthenticated, authorizeRoles(['superadmin', 'admin']), getUsersByOrganization);
 userManagementRouter.get('/getbyId/:id', isAuthenticated, authorizeRoles(['superadmin', 'admin']), getUserById);
 userManagementRouter.put('/update/:id', isAuthenticated, authorizeRoles(['superadmin', 'admin']), updateUser);
 userManagementRouter.delete('/delete/:id', isAuthenticated, authorizeRoles(['superadmin', 'admin']), deleteUser);
@@ -21,5 +23,8 @@ userManagementRouter.delete('/delete/:id', isAuthenticated, authorizeRoles(['sup
 userManagementRouter.patch('/activate/:id', isAuthenticated, authorizeRoles(['superadmin', 'admin']), activateUser);
 
 userManagementRouter.get('/generate-mfa/:id', isAuthenticated, authorizeRoles(['superadmin', 'admin']), enableMfaForUser);
+
+userManagementRouter.post('/create/group', isAuthenticated, authorizeRoles('superadmin'), createGroup);
+userManagementRouter.get('/group', isAuthenticated, authorizeRoles('superadmin'), getAllGroup);
 
 export default userManagementRouter;

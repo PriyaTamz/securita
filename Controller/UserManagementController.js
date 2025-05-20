@@ -1,5 +1,6 @@
 import User from '../Model/UserManagement.js';
 import Admin from '../Model/Admin.js';
+import Group from '../Model/Group.js';
 import Organization from '../Model/Organization.js';
 import bcrypt from 'bcryptjs';
 import speakeasy from 'speakeasy';
@@ -117,7 +118,18 @@ export const createAdmin = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-}
+};
+
+export const getAdminsByOrganization = async (req, res) => {
+    const { organizationId } = req.params;
+
+    try {
+        const admins = await User.find({ adminOrganizations: organizationId }).select(' -password -firstName -lastName -email -phone -mfaEnabled -mfaSecret -isLdapUser -isActive -organizations').populate('adminOrganizations');
+        res.status(200).json({ admins });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
 
 export const removeAdmin = async (req, res) => {
     try {
@@ -202,6 +214,17 @@ export const getAllUsers = async (req, res) => {
     }
 };
 
+export const getUsersByOrganization = async (req, res) => {
+    const { organizationId } = req.params;
+
+    try {
+        const users = await User.find({ organizations: organizationId }).select(' -password -firstName -lastName -email -phone -mfaEnabled -mfaSecret -isLdapUser -isActive -adminOrganizations').populate('organizations');
+        res.status(200).json({ users });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
 export const getUserById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -220,20 +243,31 @@ export const getUserById = async (req, res) => {
 export const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
-        const { firstName, lastName, email, phone, timeZone } = req.body;
+        const { username, password, firstName, lastName, email, phone, timeZone, mfaEnabled } = req.body;
 
-        const updateUser = await User.findByIdAndUpdate(
+        const updateData = await User.findByIdAndUpdate(
             id,
-            { firstName, lastName, email, phone, timeZone, updatedAt: new Date() },
+            { username, password, firstName, lastName, email, phone, timeZone, mfaEnabled, updatedAt: new Date() },
             { new: true }
-        ).select('-password -mfaSecret').populate('organizations');
+        );
 
-        if (!updateUser) {
+        if (password) {
+            updateData.password = await bcrypt.hash(password, 10);
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            id,
+            { $set: updateData },
+            { new: true, runValidators: true }
+        ).select('-password -mfaSecret');
+
+        if (!updatedUser) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        res.json({ message: 'User updated successfully', user: updateUser });
+        res.status(200).json({ message: 'User updated successfully', user: updatedUser });
     } catch (error) {
+        console.error('updateUser error:', error);
         res.status(500).json({ message: error.message });
     }
 };
@@ -298,5 +332,48 @@ export const enableMfaForUser = async (req, res) => {
     } catch (error) {
         console.error('Error enabling MFA:', error);
         res.status(500).json({ message: 'Internal server error.' });
+    }
+};
+
+export const createGroup = async (req, res) => {
+    try {
+        const { name, userIds, organizationId } = req.body;
+
+        const existingGroup = await Group.findOne({ name });
+        if (existingGroup) {
+            return res.status(400).json({ message: 'Group name already exists' });
+        }
+
+        const usersExist = await User.find({ _id: { $in: userIds } });
+        if (usersExist.length !== userIds.length) {
+            return res.status(404).json({ message: 'One or more users not found' });
+        }
+
+        const orgExists = await Organization.findById(organizationId);
+        if (!orgExists) {
+            return res.status(404).json({ message: 'Organization not found' });
+        }
+
+        const newGroup = new Group({
+            name,
+            users: userIds,
+            organization: organizationId,
+            createdBy: req.user.id
+        });
+
+        await newGroup.save();
+        res.status(201).json({ message: 'Group created successfully', group: newGroup });
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const getAllGroup = async (req, res) => {
+    try {
+        const groups = await Group.find();
+        res.status(201).json({ groups });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 };
