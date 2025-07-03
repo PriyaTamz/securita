@@ -5,6 +5,6 @@ import { isAuthenticated, authorizeRoles } from '../middleware/auth.js';
 const roleRouter = express.Router();
 
 roleRouter.post('/admin/login', adminLogin); 
-roleRouter.post('/admin/logout', isAuthenticated, authorizeRoles('superadmin'), adminLogout); 
+roleRouter.post('/admin/logout', isAuthenticated, adminLogout); 
 
 export default roleRouter;

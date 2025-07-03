@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema({
     timeZone: { type: String },
     mfaSecret: { type: String, default: null },
     mfaEnabled: { type: Boolean, default: false },
+    mfaQrShown: { type: Boolean, default: false },
     isLdapUser: { type: Boolean, default: false },
     isActive: { type: Boolean, default: true },
     organizations: [{

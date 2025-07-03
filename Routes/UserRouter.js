@@ -1,10 +1,13 @@
 import express from 'express';
-import { getUserMfaQrCode, userLogin, verifyMfaToken} from '../Controller/UserController.js';
+import { userLogin, getMfaQrCode, verifyMfaToken, userLogout } from '../Controller/UserController.js';
+import { isAuthenticated, authorizeRoles } from '../middleware/auth.js';
 
 const userRouter = express.Router();
 
-userRouter.get('/mfa-qrcode/:userId', getUserMfaQrCode);
 userRouter.post('/user/login', userLogin); 
-userRouter.post('/user/verify-mfa', verifyMfaToken);
+userRouter.get('/mfa-qrcode/:userId', getMfaQrCode);
+userRouter.post('/verify-mfa/:userId', verifyMfaToken);
+
+userRouter.post('/user/logout', isAuthenticated, userLogout);
 
 export default userRouter;

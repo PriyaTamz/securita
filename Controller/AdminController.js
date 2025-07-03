@@ -36,7 +36,7 @@ export const adminLogin = async (req, res) => {
     }
 };
 
-export const createGroup = async (req, res) => {
+/*export const createGroup = async (req, res) => {
     try {
         const { name, userIds, organizationId } = req.body;
 
@@ -77,4 +77,4 @@ export const getAllGroup = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-};
+};*/

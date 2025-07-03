@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAdminsByOrganization, createGroup, getAllGroup, createAdmin, removeAdmin, createUser, getAllUsers, getUsersByOrganization, getUserById, updateUser, deleteUser, activateUser, enableMfaForUser, createOrganization, getAllOrganization, getOrganizationById } from '../Controller/UserManagementController.js';
+import { getAdminsByOrganization, createGroup, createAdmin, removeAdmin, createUser, getAllUsers, getUsersByOrganization, getUserById, updateUser, deleteUser, activateUser, enableMfaForUser, createOrganization, getAllOrganization, getOrganizationById, getAllGroups, getGroupsByOrg, updateGroup, deleteGroup } from '../Controller/UserManagementController.js';
 import { isAuthenticated, authorizeRoles } from '../middleware/auth.js';
 import { authorizeRole } from '../middleware/authorizeRole.js';
 
@@ -25,6 +25,9 @@ userManagementRouter.patch('/activate/:id', isAuthenticated, authorizeRoles(['su
 userManagementRouter.get('/generate-mfa/:id', isAuthenticated, authorizeRoles(['superadmin', 'admin']), enableMfaForUser);
 
 userManagementRouter.post('/create/group', isAuthenticated, authorizeRoles('superadmin'), createGroup);
-userManagementRouter.get('/group', isAuthenticated, authorizeRoles('superadmin'), getAllGroup);
+userManagementRouter.get('/groups', isAuthenticated, authorizeRoles('superadmin'), getAllGroups );
+userManagementRouter.get('/group/:organizationId', isAuthenticated, authorizeRoles('superadmin'), getGroupsByOrg );
+userManagementRouter.put('/group/:groupId', isAuthenticated, authorizeRoles('superadmin'), updateGroup);
+userManagementRouter.delete('/group/:groupId', isAuthenticated, authorizeRoles('superadmin'), deleteGroup);
 
 export default userManagementRouter;
