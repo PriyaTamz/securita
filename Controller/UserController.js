@@ -1,8 +1,8 @@
-import User from '../Model/UserManagement.js';
-import Group from '../Model/Group.js';
+import User from "../Model/UserManagement.js";
+import Group from "../Model/Group.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import speakeasy from 'speakeasy';
+import speakeasy from "speakeasy";
 import qrcode from "qrcode";
 import { promisify } from "util";
 
@@ -49,11 +49,9 @@ export const getMfaQrCode = async (req, res) => {
 
     // Block second-time QR request
     if (user.mfaQrShown) {
-      return res
-        .status(403)
-        .json({
-          message: "QR code already shown. Enter 6-digit code from your app.",
-        });
+      return res.status(403).json({
+        message: "QR code already shown. Enter 6-digit code from your app.",
+      });
     }
 
     const otpauth_url = speakeasy.otpauthURL({
@@ -118,21 +116,48 @@ export const verifyMfaToken = async (req, res) => {
   }
 };
 
-/*export const getUserGroups = async (req, res) => {
-    try {
-        const { userId } = req.params;
+export const getUserGroups = async (req, res) => {
+  try {
+    const userId = req.user.id;
 
-        const groups = await Group.find({ users: userId });
+    const groups = await Group.find({ users: userId })
+      .populate("users", "username email")
+      .populate("organization", "name");
 
-        if (groups.length === 0) {
-            return res.status(404).json({ message: 'User is not part of any group' });
-        }
-
-        res.status(200).json({ message: `User is part of ${groups.length} group(s)` });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+    if (groups.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "User is not part of any group yet" });
     }
-};*/
+
+    res
+      .status(200)
+      .json({ message: `User is part of ${groups.length} group(s)`, groups });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getUserGroupById = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { groupId } = req.params;
+
+    const group = await Group.findOne({ _id: groupId, users: userId })
+      .populate("users", "username email")
+      .populate("organization", "name");
+
+    if (!group) {
+      return res
+        .status(404)
+        .json({ message: "Group not found or access denied" });
+    }
+
+    res.status(200).json({ group });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 export const userLogout = async (req, res) => {
   try {

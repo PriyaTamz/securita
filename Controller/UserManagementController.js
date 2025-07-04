@@ -102,6 +102,7 @@ export const createUser = async (req, res) => {
       lastName,
       email,
       phone,
+      role: "user",
       timeZone,
       mfaEnabled: false,
       mfaQrShown: false,

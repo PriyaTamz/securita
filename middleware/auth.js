@@ -19,38 +19,42 @@ export const isAuthenticated = (req, res, next) => {
 };
 
 export const authorizeRoles = (roles) => {
-    return (req, res, next) => {
-      if (!req.user || !roles.includes(req.user.role)) {
-        return res.status(403).json({ message: 'Access denied: insufficient privileges' });
-      }
-      next();
-    };
-  };  
+  return (req, res, next) => {
+    if (!req.user || !roles.includes(req.user.role)) {
+      return res
+        .status(403)
+        .json({ message: "Access denied: insufficient privileges" });
+    }
+    next();
+  };
+};
 
 export const isSuperadminOrAdmin = (req, res, next) => {
-    if (req.user.role === 'superadmin' || req.user.role === 'admin') {
-        return next();
-    }
-    return res.status(403).json({ message: 'Access denied: Admin or Superadmin only' });
+  if (req.user.role === "superadmin" || req.user.role === "admin") {
+    return next();
+  }
+  return res
+    .status(403)
+    .json({ message: "Access denied: Admin or Superadmin only" });
 };
 
 export const isSuperadmin = (req, res, next) => {
-    if (req.user.role !== 'superadmin') {
-        return res.status(403).json({ message: 'Access denied: Super Admin only' });
-    }
-    next();
+  if (req.user.role !== "superadmin") {
+    return res.status(403).json({ message: "Access denied: Super Admin only" });
+  }
+  next();
 };
 
 export const isAdmin = (req, res, next) => {
-    if (req.user.role !== 'admin') {
-        return res.status(403).json({ message: 'Access denied: Admin only' });
-    }
-    next();
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ message: "Access denied: Admin only" });
+  }
+  next();
 };
 
 export const isUser = (req, res, next) => {
-    if (req.user.role !== 'user') {
-        return res.status(403).json({ message: 'Access denied: User only' });
-    }
-    next();
+  if (req.user.role !== "user") {
+    return res.status(403).json({ message: "Access denied: User only" });
+  }
+  next();
 };
