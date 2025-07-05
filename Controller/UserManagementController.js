@@ -455,6 +455,8 @@ export const createGroup = async (req, res) => {
     });
 
     await newGroup.save();
+
+ 
     res
       .status(201)
       .json({ message: "Group created successfully", group: newGroup });
@@ -466,8 +468,8 @@ export const createGroup = async (req, res) => {
 export const getAllGroups = async (req, res) => {
   try {
     const groups = await Group.find()
-      .populate('users', 'username email')
-      .populate('organization', 'name');
+      .populate("users", "username email")
+      .populate("organization", "organization");
 
     res.status(200).json({ groups });
   } catch (error) {
@@ -481,9 +483,9 @@ export const getGroupsByOrg = async (req, res) => {
 
     console.log("Fetching groups for org:", organizationId);
 
-    const groups = await Group.find({ organization: organizationId })  // ✅ correct key
-      .populate('users', 'username email')
-      .populate('organization', 'name');
+    const groups = await Group.find({ organization: organizationId }) // ✅ correct key
+      .populate("users", "username email")
+      .populate("organization", "name");
 
     console.log("Groups found:", groups);
 
@@ -527,7 +529,8 @@ export const updateGroup = async (req, res) => {
 
     if (invalidUsers.length > 0) {
       return res.status(400).json({
-        message: "One or more users do not belong to the specified organization",
+        message:
+          "One or more users do not belong to the specified organization",
         invalidUserIds: invalidUsers.map((u) => u._id),
       });
     }
@@ -559,6 +562,3 @@ export const deleteGroup = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
-
-
